@@ -11,5 +11,9 @@ namespace DogTrainer.Application.Exceptions
         public EntityNotFoundException(int id) : base($"Entity '{typeof(T).Name}' with id '{id}' was not found.")
         {
         }
+
+        public EntityNotFoundException(string message) : base(message)
+        {
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace DogTrainer.Application.Repositories
                 .FirstOrDefaultAsync();
             if(entity is null)
             {
-                throw new EntityNotFoundException<AppUserSkill>(userId);
+                throw new EntityNotFoundException<AppUserSkill>($"UserAppSkill Entity for user id {userId} and skill id {skillId} could not be found ");
             }
             dbContext.UserSkills.Remove(entity);
             await dbContext.SaveChangesAsync();
