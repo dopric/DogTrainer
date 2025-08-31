@@ -19,6 +19,31 @@ namespace DogTrainer.Persistance.Migrations
                 name: "PK_Users",
                 table: "Users");
 
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_UserSkills",
+                table: "UserSkills");
+
+            migrationBuilder.DropColumn(
+                name: "Id",
+                table: "Users");
+            migrationBuilder.AddColumn<string>(
+                name: "Id",
+                table: "Users",
+                type: "nvarchar(450)",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.DropColumn(
+                name: "AppUserId",
+                table: "UserSkills");
+
+            migrationBuilder.AddColumn<string>(
+                name: "AppUserId",
+                table: "UserSkills",
+                type: "nvarchar(450)",
+                nullable: false,
+                defaultValue: "");
+
             migrationBuilder.DropColumn(
                 name: "Password",
                 table: "Users");
@@ -27,13 +52,13 @@ namespace DogTrainer.Persistance.Migrations
                 name: "Users",
                 newName: "AspNetUsers");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "AppUserId",
-                table: "UserSkills",
-                type: "nvarchar(450)",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int");
+            //migrationBuilder.AlterColumn<string>(
+            //    name: "AppUserId",
+            //    table: "UserSkills",
+            //    type: "nvarchar(450)",
+            //    nullable: false,
+            //    oldClrType: typeof(int),
+            //    oldType: "int");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -44,14 +69,14 @@ namespace DogTrainer.Persistance.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Id",
-                table: "AspNetUsers",
-                type: "nvarchar(450)",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
+            //migrationBuilder.AlterColumn<string>(
+            //    name: "Id",
+            //    table: "AspNetUsers",
+            //    type: "nvarchar(450)",
+            //    nullable: false,
+            //    oldClrType: typeof(int),
+            //    oldType: "int")
+            //    .OldAnnotation("SqlServer:Identity", "1, 1");
 
             migrationBuilder.AddColumn<int>(
                 name: "AccessFailedCount",
