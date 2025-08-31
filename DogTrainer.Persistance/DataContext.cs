@@ -32,6 +32,8 @@ namespace DogTrainer.Persistance
                 .HasOne(aus => aus.Skill)
                 .WithMany(s => s.AppUsers)
                 .HasForeignKey(aus => aus.SkillId);
+
+            base.OnModelCreating(builder);
         }
     }
 }
