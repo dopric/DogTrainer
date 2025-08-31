@@ -1,9 +1,10 @@
 ﻿using DogTrainer.Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DogTrainer.Persistance
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<AppUser>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -13,7 +14,7 @@ namespace DogTrainer.Persistance
 
 
 
-        public DbSet<AppUser> Users { get; set; }
+        //public DbSet<AppUser> Users { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<AppUserSkill> UserSkills { get; set; }
 

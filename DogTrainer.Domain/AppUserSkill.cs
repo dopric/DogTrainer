@@ -2,10 +2,9 @@
 {
     public class AppUserSkill
     {
-        //public int AppUserSkillId { get; set; }
         public int AppUserId { get; set; }
-        public AppUser AppUser { get; set; }
+        public required AppUser AppUser { get; set; }
         public int SkillId { get; set; }
-        public Skill Skill { get; set; }
+        public required Skill Skill { get; set; }
     }
 }

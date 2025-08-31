@@ -1,58 +1,43 @@
-﻿using DogTrainer.Application.Exceptions;
+﻿using AutoMapper;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DogTrainer.Application.Repositories
 {
     public class SkillRepository : ISkillRepository
     {
-        private readonly DataContext dbContext;
 
-        public SkillRepository(DataContext dbContext)
+        private readonly BaseRepository<Skill> _baseRepository;
+        public SkillRepository(DataContext dbContext, IMapper mapper)
         {
-            this.dbContext = dbContext;
+            _baseRepository = new BaseRepository<Skill>(dbContext, mapper);
         }
 
         public async Task<Skill> AddAsync(Skill entity)
         {
-            await dbContext.Skills.AddAsync(entity);
-            await dbContext.SaveChangesAsync();
-            return entity;
+            return await _baseRepository.AddAsync(entity);
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(Expression<Func<Skill, bool>> expression)
         {
-            var skill = await dbContext.Skills.Where(s => s.Id == id).FirstOrDefaultAsync();
-            if(skill is null)
-            {
-                throw new EntityNotFoundException<Skill>(id);
-            }
-            dbContext.Skills.Remove(skill);
-            await dbContext.SaveChangesAsync();
+            await _baseRepository.DeleteByIdAsync(expression);
         }
 
-        public async Task<IEnumerable<Skill>> GetAllAsync()
+        public async Task<ICollection<Skill>> GetAllAsync()
         {
-            return await dbContext.Skills.ToListAsync();
+            return await _baseRepository.GetAllAsync();
         }
 
-        public async Task<Skill?> GetByIdAsync(int id)
+        public async Task<Skill?> GetByIdAsync(Expression<Func<Skill, bool>> expression)
         {
-            return await dbContext.Skills.Where(s => s.Id == id).FirstOrDefaultAsync();
+            return await _baseRepository.GetByIdAsync(expression);
         }
 
-        public async Task<Skill> UpdateAsync(Skill entity)
+        public async Task<Skill> UpdateAsync(Expression<Func<Skill, bool>> expression)
         {
-            var skill = await dbContext.Skills.Where(s => s.Id == entity.Id).FirstOrDefaultAsync();
-            if(skill is null)
-            {
-                throw new EntityNotFoundException<Skill>(entity.Id);
-            }
-            skill.Name = entity.Name;
-            await dbContext.SaveChangesAsync();
-            return skill;
+            return await _baseRepository.UpdateAsync(expression);
         }
     }
 }

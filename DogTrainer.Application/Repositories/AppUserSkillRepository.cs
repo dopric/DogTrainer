@@ -1,55 +1,38 @@
-﻿using DogTrainer.Application.Exceptions;
+﻿using AutoMapper;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DogTrainer.Application.Repositories
 {
     public class AppUserSkillRepository : IAppUserSkillRepository
     {
-        private readonly DataContext dbContext;
+        private readonly BaseRepository<AppUserSkill> _baseRepository;
 
-        public AppUserSkillRepository(DataContext dbContext)
+        public AppUserSkillRepository(DataContext dbContext, IMapper mapper)
         {
-            this.dbContext = dbContext;
+            _baseRepository = new BaseRepository<AppUserSkill>(dbContext, mapper);
         }
         public async Task<AppUserSkill> AddAsync(AppUserSkill entity)
         {
-            await dbContext.UserSkills.AddAsync(entity);
-            await dbContext.SaveChangesAsync();
-            return entity;
+            return await _baseRepository.AddAsync(entity);
         }
 
-        public async Task DeleteByIdAsync(int userId, int skillId)
+        public async Task DeleteByIdAsync(Expression<Func<AppUserSkill, bool>> expression)
         {
-            var entity = await dbContext.UserSkills
-                .Where(us => us.AppUserId == userId && us.SkillId == skillId)
-                .FirstOrDefaultAsync();
-            if(entity is null)
-            {
-                throw new EntityNotFoundException<AppUserSkill>($"UserAppSkill Entity for user id {userId} and skill id {skillId} could not be found ");
-            }
-            dbContext.UserSkills.Remove(entity);
-            await dbContext.SaveChangesAsync();
+            await _baseRepository.DeleteByIdAsync(expression);
         }
 
-        public async Task<IEnumerable<AppUserSkill>> GetAllSkillsForUserAsync(int userId)
+        public async Task<IEnumerable<AppUserSkill>> GetAllSkillsForUserAsync(Expression<Func<AppUserSkill, bool>> expression)
         {
-            var skills = await dbContext.UserSkills
-                .Include(us => us.Skill)
-                .Where(us => us.AppUserId == userId)
-                .ToListAsync();
+            var skills = await _baseRepository.GetAllAsync(expression);
             return skills;
         }
 
-        public async Task<ICollection<AppUserSkill>> GetAllUsersForSkillAsync(int skillId)
+        public async Task<ICollection<AppUserSkill>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression)
         {
-            var users = await dbContext.UserSkills
-                .Include(us => us.AppUser)
-                .Where(us => us.SkillId == skillId)
-                .ToListAsync();
-            return users;
+            return await _baseRepository.GetAllAsync(expression);
         }
     }
 }

@@ -1,61 +1,45 @@
-﻿using DogTrainer.Application.Exceptions;
+﻿using AutoMapper;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace DogTrainer.Application.Repositories
 {
     public class AppUserRepository : IAppUserRepository
     {
-        private readonly DataContext dbContext;
+        private readonly BaseRepository<AppUser> _baseRepository;
 
-        public AppUserRepository(DataContext dbContext)
+        public AppUserRepository(DataContext dbContext, IMapper mapper)
         {
-            this.dbContext = dbContext;
+            _baseRepository = new BaseRepository<AppUser>(dbContext, mapper);
         }
 
         public async Task<AppUser> AddAsync(AppUser entity)
         {
-            await dbContext.Users.AddAsync(entity);
-            await dbContext.SaveChangesAsync();
-            // consider returning a DTO instead of the entity directly
+            await _baseRepository.AddAsync(entity);
             return entity;
         }
 
-        public async Task DeleteByIdAsync(int id)
+        public async Task DeleteByIdAsync(Expression<Func<AppUser, bool>> expression)
         {
-            var user = await dbContext.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
-            if(user is null)
-            {
-                throw new EntityNotFoundException<AppUser>(id);
-            }
-            dbContext.Users.Remove(user);
-            await dbContext.SaveChangesAsync();
+            await _baseRepository.DeleteByIdAsync(expression);
         }
 
-        public async Task<IEnumerable<AppUser>> GetAllAsync()
+        public async Task<ICollection<AppUser>> GetAllAsync()
         {
-            return await dbContext.Users.ToListAsync();
+            return await _baseRepository.GetAllAsync();
         }
 
-        public async Task<AppUser?> GetByIdAsync(int id)
+        public async Task<AppUser?> GetByIdAsync(Expression<Func<AppUser, bool>> expression)
         {
-            return await dbContext.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
+            var entity = await _baseRepository.GetByIdAsync(expression);
+            return entity;
         }
 
-        public async Task<AppUser> UpdateAsync(AppUser entity)
+        public async Task<AppUser> UpdateAsync(Expression<Func<AppUser, bool>> expression)
         {
-            var user = await dbContext.Users.Where(u => u.Id == entity.Id).FirstOrDefaultAsync();
-            if(user is null)
-            {
-                throw new EntityNotFoundException<AppUser>(entity.Id);
-            }
-            // update fields, better way?
-            user.Email = entity.Email;
-            user.Password = entity.Password;
-            await dbContext.SaveChangesAsync();
-            // return DTO instead of entity directly
+            var user = await _baseRepository.UpdateAsync(expression);
             return user;
         }
     }

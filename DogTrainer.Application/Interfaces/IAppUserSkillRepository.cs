@@ -1,10 +1,13 @@
-﻿namespace DogTrainer.Application.Interfaces
+﻿using DogTrainer.Domain;
+using System.Linq.Expressions;
+
+namespace DogTrainer.Application.Interfaces
 {
     public interface IAppUserSkillRepository
     {
-        Task<IEnumerable<Domain.AppUserSkill>> GetAllSkillsForUserAsync(int userId);
-        Task<ICollection<Domain.AppUserSkill>> GetAllUsersForSkillAsync(int skillId);
-        Task<Domain.AppUserSkill> AddAsync(Domain.AppUserSkill entity);
-        Task DeleteByIdAsync(int userId, int skillId);
+        Task<IEnumerable<AppUserSkill>> GetAllSkillsForUserAsync(Expression<Func<AppUserSkill, bool>> expression);
+        Task<ICollection<AppUserSkill>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression);
+        Task<AppUserSkill> AddAsync(AppUserSkill entity);
+        Task DeleteByIdAsync(Expression<Func<AppUserSkill, bool>> expression);
     }
 }
