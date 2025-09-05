@@ -1,46 +1,26 @@
 ﻿using AutoMapper;
+using DogTrainer.Application.Dtos;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
-using System.Linq.Expressions;
 
 namespace DogTrainer.Application.Repositories
 {
-    public class AppUserRepository : IAppUserRepository
+    public class AppUserRepository : BaseRepository<AppUser, AppUserDto>, IAppUserRepository
     {
-        private readonly BaseRepository<AppUser> _baseRepository;
-
         public AppUserRepository(DataContext dbContext, IMapper mapper)
+            : base(dbContext, mapper)
         {
-            _baseRepository = new BaseRepository<AppUser>(dbContext, mapper);
         }
 
-        public async Task<AppUser> AddAsync(AppUser entity)
+        public Task<AppUserDto> Login(UserLoginDto userLogin)
         {
-            await _baseRepository.AddAsync(entity);
-            return entity;
+            throw new NotImplementedException();
         }
 
-        public async Task DeleteByIdAsync(Expression<Func<AppUser, bool>> expression)
+        public Task<AppUserDto> Register(UserRegisterDto userRegister)
         {
-            await _baseRepository.DeleteByIdAsync(expression);
-        }
-
-        public async Task<ICollection<AppUser>> GetAllAsync()
-        {
-            return await _baseRepository.GetAllAsync();
-        }
-
-        public async Task<AppUser?> GetByIdAsync(Expression<Func<AppUser, bool>> expression)
-        {
-            var entity = await _baseRepository.GetByIdAsync(expression);
-            return entity;
-        }
-
-        public async Task<AppUser> UpdateAsync(Expression<Func<AppUser, bool>> expression)
-        {
-            var user = await _baseRepository.UpdateAsync(expression);
-            return user;
+            throw new NotImplementedException();
         }
     }
 }

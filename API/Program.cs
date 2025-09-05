@@ -1,5 +1,6 @@
 using AutoMapper;
 using DogTrainer.Application;
+using DogTrainer.Application.Dtos;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Application.Repositories;
 using DogTrainer.Domain;

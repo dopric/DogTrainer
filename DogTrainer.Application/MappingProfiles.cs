@@ -13,6 +13,12 @@ namespace DogTrainer.Application
 
             CreateMap<SkillDto, Skill>();
             CreateMap<Skill, SkillDto>();
+
+            CreateMap<UserLoginDto, AppUser>();
+            CreateMap<AppUser, UserLoginDto>();
+
+            CreateMap<UserRegisterDto, AppUser>();
+            CreateMap<AppUser, UserRegisterDto>();
         }
     }
 }

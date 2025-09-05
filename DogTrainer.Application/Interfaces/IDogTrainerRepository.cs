@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace DogTrainer.Application.Interfaces
 {
-    public interface IDogTrainerRepository<T> where T : class
+    public interface IDogTrainerRepository<T, D> where T : class where D : class
     {
-        Task<T?> GetByIdAsync(Expression<Func<T, bool>> expresssion);
-        Task<ICollection<T>> GetAllAsync();
+        Task<D?> GetByIdAsync(Expression<Func<T, bool>> expresssion);
+        Task<ICollection<D>> GetAllAsync();
         Task DeleteByIdAsync(Expression<Func<T, bool>> expresssion);
-        Task<T> AddAsync(T entity);
-        Task<T> UpdateAsync(Expression<Func<T, bool>> expresssion);
+        Task<D> AddAsync(T entity);
+        Task<D> UpdateAsync(Expression<Func<T, bool>> expresssion);
     }
 }

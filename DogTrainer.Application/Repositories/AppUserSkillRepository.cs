@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DogTrainer.Application.Dtos;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
@@ -6,33 +7,26 @@ using System.Linq.Expressions;
 
 namespace DogTrainer.Application.Repositories
 {
-    public class AppUserSkillRepository : IAppUserSkillRepository
+    public class AppUserSkillRepository : BaseRepository<AppUserSkill, AppUserSkillDto>, IAppUserSkillRepository
     {
-        private readonly BaseRepository<AppUserSkill> _baseRepository;
 
-        public AppUserSkillRepository(DataContext dbContext, IMapper mapper)
+        public AppUserSkillRepository(DataContext dbContext, IMapper mapper) : base(dbContext, mapper)
         {
-            _baseRepository = new BaseRepository<AppUserSkill>(dbContext, mapper);
-        }
-        public async Task<AppUserSkill> AddAsync(AppUserSkill entity)
-        {
-            return await _baseRepository.AddAsync(entity);
         }
 
-        public async Task DeleteByIdAsync(Expression<Func<AppUserSkill, bool>> expression)
+        public Task<IEnumerable<AppUserSkillDto>> GetAllSkillsForUserAsync(Expression<Func<AppUserSkill, bool>> expression)
         {
-            await _baseRepository.DeleteByIdAsync(expression);
+            throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<AppUserSkill>> GetAllSkillsForUserAsync(Expression<Func<AppUserSkill, bool>> expression)
+        public Task<ICollection<AppUserSkillDto>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression)
         {
-            var skills = await _baseRepository.GetAllAsync(expression);
-            return skills;
+            throw new NotImplementedException();
         }
 
-        public async Task<ICollection<AppUserSkill>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression)
+        Task<AppUserSkillDto> IAppUserSkillRepository.AddAsync(AppUserSkill entity)
         {
-            return await _baseRepository.GetAllAsync(expression);
+            throw new NotImplementedException();
         }
     }
 }
