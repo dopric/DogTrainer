@@ -20,12 +20,12 @@ namespace DogTrainer.Application.Repositories
             this._mapper = mapper;
         }
 
-        public async Task<TDto> AddAsync(TEntity entity)
+        public async Task<TDto> AddAsync<TDto>(TDto dto)
         {
+            var entity = _mapper.Map<TEntity>(dto);
             await _dbContext.Set<TEntity>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
-            // check?
-            var dto = _mapper.Map<TEntity, TDto>(entity);
+
             return dto;
         }
 
@@ -40,7 +40,7 @@ namespace DogTrainer.Application.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<ICollection<TDto>> GetAllAsync()
+        public async Task<ICollection<TDto>> GetAllAsync<TDto>()
         {
             var listOfEntities = await _dbContext.Set<TEntity>().ProjectTo<TDto>(_mapper.ConfigurationProvider).ToListAsync();
             return listOfEntities;
@@ -48,25 +48,23 @@ namespace DogTrainer.Application.Repositories
 
         public async Task<ICollection<TDto>> GetAllAsync(Expression<Func<TEntity, bool>> expression)
         {
-            // problem je sa ProjectTo pokusava da mapira AppUser na AppUser
-            // da li postoji nacin da spolja se kaze tip D?
             var listOfEntities = await _dbContext.Set<TEntity>().Where(expression).ProjectTo<TDto>(_mapper.ConfigurationProvider).ToListAsync();
             return listOfEntities;
         }
 
-        public async Task<TDto?> GetByIdAsync(Expression<Func<TEntity, bool>> expression)
+        public async Task<TDto?> GetByIdAsync<TDto>(Expression<Func<TEntity, bool>> expression)
         {
             var entity = await _dbContext.Set<TEntity>().Where(expression).ProjectTo<TDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
             return entity;
         }
 
-        public async Task<TDto> UpdateAsync(Expression<Func<TEntity, bool>> expression)
+        public async Task<TDto> UpdateAsync<TDto>(TEntity entity)
         {
-            // TODO: sta treba da ide u update Entity ili Dto
-            var entry = await _dbContext.Set<TEntity>().Where(expression).ProjectTo<TDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
-            _mapper.Map<TEntity>(entry);
+
+             _dbContext.Set<TEntity>().Update(entity);
             await _dbContext.SaveChangesAsync();
-            return entry;
+            // konverzija ovde nije potrebna zato sto se radi o prostom objektu 
+            return _mapper.Map<TDto>(entity);
         }
     }
 }

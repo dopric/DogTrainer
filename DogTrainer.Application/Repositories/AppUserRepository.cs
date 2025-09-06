@@ -13,14 +13,25 @@ namespace DogTrainer.Application.Repositories
         {
         }
 
-        public Task<AppUserDto> Login(UserLoginDto userLogin)
+        public async Task<AppUserDto> Login(UserLoginDto userLogin)
         {
-            throw new NotImplementedException();
+            var user = await GetByIdAsync<AppUserDto>(u => u.Email == userLogin.UserName && u.PasswordHash == userLogin.Password);
+            if(user == null)
+            {
+                throw new Exception("Invalid username or password");
+            }
+            return user;
         }
 
-        public Task<AppUserDto> Register(UserRegisterDto userRegister)
+        public async Task<AppUserDto> Register(UserRegisterDto userRegister)
         {
-            throw new NotImplementedException();
+            var user = await GetByIdAsync<AppUserDto>(u => u.Email == userRegister.Email || u.UserName == userRegister.UserName);
+            if(user != null)
+            {
+                throw new Exception("User with given email or username already exists");
+            }
+
+            return user;
         }
     }
 }

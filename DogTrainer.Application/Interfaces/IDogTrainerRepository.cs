@@ -9,10 +9,10 @@ namespace DogTrainer.Application.Interfaces
 {
     public interface IDogTrainerRepository<T, D> where T : class where D : class
     {
-        Task<D?> GetByIdAsync(Expression<Func<T, bool>> expresssion);
-        Task<ICollection<D>> GetAllAsync();
+        Task<D?> GetByIdAsync<D>(Expression<Func<T, bool>> expresssion);
+        Task<ICollection<D>> GetAllAsync<D>();
         Task DeleteByIdAsync(Expression<Func<T, bool>> expresssion);
-        Task<D> AddAsync(T entity);
-        Task<D> UpdateAsync(Expression<Func<T, bool>> expresssion);
+        Task<D> AddAsync<D>(D dto);
+        Task<D> UpdateAsync<D>(T entity);
     }
 }

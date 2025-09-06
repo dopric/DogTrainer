@@ -53,7 +53,7 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var existingUser = await _userRepository.GetByIdAsync(u => u.UserName == userRegister.UserName || u.Email == userRegister.Email);
+            var existingUser = await _userRepository.GetByIdAsync<AppUserDto>(u => u.UserName == userRegister.UserName || u.Email == userRegister.Email);
             if(existingUser != null)
             {
                 return BadRequest("User already exists");
@@ -62,7 +62,8 @@ namespace API.Controllers
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userRegister.Password);
             userRegister.Password = hashedPassword;
 
-            //var userDto = await _userRepository.Register(userRegister);
+            var userDto = await _userRepository.Register(userRegister);
+
 
             return Ok("Registrierung erfolgreich");
         }
