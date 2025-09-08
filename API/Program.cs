@@ -1,3 +1,4 @@
+using API.Services;
 using AutoMapper;
 using DogTrainer.Application;
 using DogTrainer.Application.Dtos;
@@ -7,6 +8,7 @@ using DogTrainer.Application.Repositories;
 using DogTrainer.Application.Skills.Commands;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -23,7 +25,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AddSkillCommand.Handler).Assembly));
-builder.Services.AddTransient(typeof(IPipeLineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+//builder.Services.AddScoped<TokenService>();
+builder.Services.AddIdentityServices(builder.Configuration);
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -58,12 +63,12 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentityCore<AppUser>(opt =>
-{
-    opt.Password.RequireNonAlphanumeric = false;
-})
-            .AddEntityFrameworkStores<DataContext>()
-            .AddSignInManager<SignInManager<AppUser>>();
+//builder.Services.AddIdentityCore<AppUser>(opt =>
+//{
+//    opt.Password.RequireNonAlphanumeric = false;
+//})
+//            .AddEntityFrameworkStores<DataContext>()
+//            .AddSignInManager<SignInManager<AppUser>>();
 
 builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
