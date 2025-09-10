@@ -1,14 +1,12 @@
 ﻿using DogTrainer.Application.Dtos;
-using DogTrainer.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using BCrypt.Net;
 using DogTrainer.Domain;
 using MediatR;
 using DogTrainer.Application.Features.AppUser.Queries;
 using DogTrainer.Application.Features.AppUser.Command;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -16,16 +14,17 @@ namespace API.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
-        private readonly IAppUserRepository _userRepository;
         private readonly IMediator _mediator;
+        private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly TokenService _tokenService;
 
-        public AccountsController(IMediator mediator, SignInManager<AppUser> signInManager, TokenService tokenService)
+        public AccountsController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, TokenService tokenService, IMediator mediator)
         {
-            this._mediator = mediator;
+            _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _mediator = mediator;
         }
 
         [HttpPost("login")]
@@ -36,16 +35,14 @@ namespace API.Controllers
                 return BadRequest(ModelState);
             }
 
-            // try to get the user with this email
-            var user = await _signInManager.UserManager.Users.FirstOrDefaultAsync(u => u.UserName == userLogin.UserName);
-
-            if(user is null)
+            // Login per Username
+            var user = await _userManager.FindByNameAsync(userLogin.UserName);
+            if (user is null)
             {
-                return Unauthorized("Invalid credentials");
+                return Unauthorized("Ungültige Anmeldedaten");
             }
 
-            // Versuche, den Benutzer mit dem angegebenen Passwort anzumelden
-            var result = await _signInManager.CheckPasswordSignInAsync(user, userLogin.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, userLogin.Password, lockoutOnFailure: false);
 
             if(!result.Succeeded)
             {
@@ -71,45 +68,48 @@ namespace API.Controllers
             }
 
             //var existingUser = await _mediator.Send(new GetUserQuery.Query { RegisterDto = userRegister });
-            var existingUser = await _signInManager.UserManager.Users.FirstOrDefaultAsync(u => u.Email.Equals(userRegister.Email));
-
-            if(existingUser != null)
+            // Prüfe E-Mail und Benutzername
+            var existingByEmail = await _userManager.FindByEmailAsync(userRegister.Email);
+            if (existingByEmail != null)
             {
-                return BadRequest("User already exists");
+                return BadRequest("E-Mail ist bereits registriert.");
+            }
+            var existingByName = await _userManager.FindByNameAsync(userRegister.UserName);
+            if (existingByName != null)
+            {
+                return BadRequest("Benutzername ist bereits vergeben.");
             }
 
-            //var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userRegister.Password);
             var appUser = new AppUser
             {
                 UserName = userRegister.UserName,
-                Email = userRegister.Email,
-                PasswordHash = userRegister.Password
+                Email = userRegister.Email
+                // KEIN PasswordHash setzen – CreateAsync übernimmt das Hashing
             };
-            //userRegister.Password = hashedPassword;
-            var result = await _signInManager.UserManager.CreateAsync(appUser, userRegister.Password);
 
-            if(result.Succeeded)
+            var result = await _userManager.CreateAsync(appUser, userRegister.Password);
+            if (!result.Succeeded)
             {
-                // create jwt token
-                var token = _tokenService.CreateToken(appUser);
-                var registredUser = new RegistredUser
-                {
-                    Email = appUser.Email,
-                    Token = token
-                };
-
-                return Ok(registredUser);
+                return BadRequest("Registrierung fehlgeschlagen.");
             }
-            return BadRequest("Registrierung nicht erfolgreich");
-        }
 
+            var tokenReg = _tokenService.CreateToken(appUser);
+            var registredUser = new RegistredUser
+            {
+                Email = appUser.Email,
+                Token = tokenReg
+            };
+            return Ok(registredUser);
+           
+        }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(string id)
         {
             var user = await _mediator.Send(new GetUserByIdQuery.Query { Id = id });
-            if(user == null)
+            if (user == null)
             {
-                return BadRequest("User can not be deleted, user not found");
+                return NotFound("Benutzer nicht gefunden.");
             }
 
             await _mediator.Send(new DeleteUserCommand.Command(id));

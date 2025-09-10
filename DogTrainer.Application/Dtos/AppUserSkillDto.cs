@@ -8,7 +8,7 @@ namespace DogTrainer.Application.Dtos
 {
     public class AppUserSkillDto
     {
-        AppUserDto AppUser { get; set; }
-        SkillDto Skill { get; set; }
+        public required string  AppUserId { get; set; }
+        public required int SkillId { get; set; }
     }
 }

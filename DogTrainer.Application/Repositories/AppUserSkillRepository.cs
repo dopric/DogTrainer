@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using DogTrainer.Application.Dtos;
+using DogTrainer.Application.Exceptions;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Domain;
 using DogTrainer.Persistance;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DogTrainer.Application.Repositories
@@ -14,19 +17,43 @@ namespace DogTrainer.Application.Repositories
         {
         }
 
-        public Task<IEnumerable<AppUserSkillDto>> GetAllSkillsForUserAsync(Expression<Func<AppUserSkill, bool>> expression)
+        public async Task DeleteAppUserSkillAsync(string userId, int skillId)
         {
-            throw new NotImplementedException();
+            var entity = await _dbContext.UserSkills.FirstOrDefaultAsync(x => x.AppUserId == userId && x.SkillId == skillId);
+            if (entity != null)
+            {
+                 _dbContext.UserSkills.Remove(entity);
+                 await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new EntityNotFoundException<AppUserSkill>("User Skill not found");
+            }
         }
 
-        public Task<ICollection<AppUserSkillDto>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression)
+        public async Task<IEnumerable<AppUserSkillDto>> GetAllSkillsForUserAsync(string userId)
         {
-            throw new NotImplementedException();
+            var userSkills = await _dbContext.UserSkills
+                .AsNoTracking()
+                .Where(u=> u.AppUserId == userId)
+                .ProjectTo<AppUserSkillDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+            return userSkills;
         }
 
-        Task<AppUserSkillDto> IAppUserSkillRepository.AddAsync(AppUserSkill entity)
+        public async Task<ICollection<AppUserSkillDto>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression)
         {
-            throw new NotImplementedException();
+            var userSkills = await _dbContext.UserSkills
+                .AsNoTracking()
+                .Where(expression)
+                .ProjectTo<AppUserSkillDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+            return userSkills;
+        }
+
+        public async Task<AppUserSkillDto> AddAsync(AppUserSkillDto dto)
+        {
+            return await base.AddAsync<AppUserSkillDto>(dto);
         }
     }
 }

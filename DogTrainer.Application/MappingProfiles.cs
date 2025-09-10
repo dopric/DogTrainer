@@ -26,7 +26,8 @@ namespace DogTrainer.Application
             CreateMap<UpdateSkillDto, Skill>();
             CreateMap<Skill, UpdateSkillDto>();
 
-            
+            CreateMap<AppUserSkill, AppUserSkillDto>();
+            CreateMap<AppUserSkillDto, AppUserSkill>();
         }
     }
 }

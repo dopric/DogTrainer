@@ -11,8 +11,8 @@ namespace DogTrainer.Application.Repositories
 {
     public class BaseRepository<TEntity, TDto> : IDogTrainerRepository<TEntity, TDto> where TEntity : class where TDto : class
     {
-        private readonly DataContext _dbContext;
-        private readonly IMapper _mapper;
+        protected readonly DataContext _dbContext;
+        protected readonly IMapper _mapper;
 
         public BaseRepository(DataContext dbContext, IMapper mapper)
         {

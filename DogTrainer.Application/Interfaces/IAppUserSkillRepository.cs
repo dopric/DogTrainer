@@ -6,9 +6,10 @@ namespace DogTrainer.Application.Interfaces
 {
     public interface IAppUserSkillRepository
     {
-        Task<IEnumerable<AppUserSkillDto>> GetAllSkillsForUserAsync(Expression<Func<AppUserSkill, bool>> expression);
+        Task<IEnumerable<AppUserSkillDto>> GetAllSkillsForUserAsync(string userId);
         Task<ICollection<AppUserSkillDto>> GetAllUsersForSkillAsync(Expression<Func<AppUserSkill, bool>> expression);
-        Task<AppUserSkillDto> AddAsync(AppUserSkill entity);
+        Task<AppUserSkillDto> AddAsync(AppUserSkillDto dto);
         Task DeleteByIdAsync(Expression<Func<AppUserSkill, bool>> expression);
+        Task DeleteAppUserSkillAsync(string userId, int skillId);
     }
 }

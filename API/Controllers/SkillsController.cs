@@ -1,8 +1,10 @@
-﻿using DogTrainer.Application.Dtos;
+﻿
+using DogTrainer.Application.Dtos;
 using DogTrainer.Application.Interfaces;
 using DogTrainer.Application.Skills.Commands;
 using DogTrainer.Application.Skills.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,17 +14,19 @@ namespace API.Controllers
     [ApiController]
     public class SkillsController : ControllerBase
     {
-
+    
         private readonly IMediator _mediator;
 
         public SkillsController(IMediator mediator)
         {
             _mediator = mediator;
         }
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> CreateSkill([FromBody] SkillDto dto)
         {
-            return Ok(await _mediator.Send(new AddSkillCommand.Command { Skill = dto }));
+            var createdSkill = await _mediator.Send(new AddSkillCommand.Command { Skill = dto });
+            return CreatedAtAction(nameof(GetSkillById), new { name = createdSkill.Name }, createdSkill);
         }
 
         [HttpGet]
@@ -32,6 +36,7 @@ namespace API.Controllers
             return Ok(skills);
         }
 
+        [Authorize]
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteSkill(int id)
         {
@@ -50,6 +55,7 @@ namespace API.Controllers
             return Ok(skill);
         }
 
+        [Authorize]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateSkill(int id, [FromBody] UpdateSkillDto dto)
         {
